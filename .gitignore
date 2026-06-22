@@ -1,0 +1,7 @@
+venv/
+Lib/
+Scripts/
+__pycache__/
+.idea/
+.ipynb_checkpoints/
+product_similarity.pkl
