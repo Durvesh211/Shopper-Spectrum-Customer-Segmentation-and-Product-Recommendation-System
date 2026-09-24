@@ -45,45 +45,33 @@ else:
     connection.close()
 
     top_k = st.slider(
-        "Number of recommendations",
-        min_value=1,
-        max_value=20,
-        value=5
-    )
+        "Number of recommendations",min_value=1,max_value=20,value=5)
 
-    product_search = st.text_input("Enter Product Name", placeholder="Type part of a product name...")
-    product = None
-    if product_search:
-        matching_products = products_df[products_df["product"].str.contains(product_search,case=False,na=False)]["product"].tolist()
-        if matching_products:
-            product = st.selectbox("Matching Products", matching_products)
-        else:
-            st.warning("No matching products found.")
+    product = st.selectbox("Select or Search Product", products_df["product"].tolist(),index=None,  placeholder="Click to browse products or type to search...")
 
     if st.button("Get Recommended Products"):
         if product is None:
-            st.warning("Please select a product from the matching products.")
+            st.warning("Please select a product from the match.")
         else:
-
             connection = sqlite3.connect("top20_recommendations.db")
 
-        query = """
-              SELECT recommended_product, similarity
-              FROM recommendations
-              WHERE product = ?
-              ORDER BY rank
-              LIMIT ?
-          """
-        recommendations = pd.read_sql_query(    query,connection, params=[product, top_k])
+            query = """
+                  SELECT recommended_product, similarity
+                  FROM recommendations
+                  WHERE product = ?
+                  ORDER BY rank
+                  LIMIT ?
+              """
+            recommendations = pd.read_sql_query(query,connection, params=[product, top_k])
 
-        connection.close()
+            connection.close()
 
-        if not recommendations.empty:
+            if not recommendations.empty:
 
-            st.subheader("Recommended Products")
+                st.subheader("Recommended Products")
 
-            for i, row in recommendations.iterrows():
-                st.write(f"{i + 1}. {row['recommended_product']}")
+                for i, row in recommendations.iterrows():
+                    st.write(f"{i + 1}. {row['recommended_product']}")
 
-        else:
-            st.error("Product not found. Please enter the exact product name.")
+            else:
+                st.error("Product not found. Please enter the exact product name.")
