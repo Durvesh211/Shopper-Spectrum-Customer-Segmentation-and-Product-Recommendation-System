@@ -4,6 +4,19 @@ import joblib
 import sqlite3
 
 st.title("Shopping Spectrum")
+st.markdown(
+    """
+    ### Customer Segmentation & Product Recommendation System
+
+    Shopper Spectrum is a machine learning application that helps
+    understand **customer purchasing behaviour** and provides
+    **product recommendations** based on historical purchase patterns.
+
+    Use the menu on the left to explore the two modules.
+    """
+)
+
+st.divider()
 selection = st.sidebar.selectbox("Select Module",["Customer Segmentation","Product Recommendation"])
 
 scaler = joblib.load('scaler.pkl')
@@ -19,6 +32,21 @@ clusters= {
 
 if selection == "Customer Segmentation":
     st.header("Customer Segmentation")
+    st.markdown(
+        """
+        ### What does this module do?
+
+        This module uses **RFM analysis** to understand customer
+        purchasing behaviour and assigns the customer to a segment
+        using a trained **K-Means clustering model**.
+
+        **RFM stands for:**
+
+        - **Recency** → How recently the customer purchased
+        - **Frequency** → How often the customer purchased
+        - **Monetary** → How much the customer spent
+        """
+    )
     recency = st.number_input("Recency(days)", min_value =0)
     frequency = st.number_input("Frequency",min_value = 0.0)
     monetary = st.number_input("Monetary",min_value = 0)
@@ -30,6 +58,19 @@ if selection == "Customer Segmentation":
         st.success(f"Predicted Cluster: {clusters[cluster]}")
 else:
     st.header("Product Recommendation")
+
+    st.markdown(
+        """
+        ### What does this module do?
+
+        This module recommends products that are **similar to the
+        product selected by the user**.
+
+        The recommendations were generated from the historical
+        product transaction data and stored in a lightweight
+        SQLite database for fast retrieval.
+        """
+    )
 
     connection = sqlite3.connect("top20_recommendations.db")
 
