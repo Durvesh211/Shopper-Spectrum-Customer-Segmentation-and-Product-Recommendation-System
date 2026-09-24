@@ -56,6 +56,13 @@ if selection == "Customer Segmentation":
         scaled =scaler.transform(input_data)
         cluster = kmeans.predict(scaled)[0]
         st.success(f"Predicted Cluster: {clusters[cluster]}")
+
+    with st.expander("⚙️ Model Information"):
+        st.write("**Algorithm:** K-Means Clustering")
+        st.write("**Number of clusters:** 5")
+        st.write("**Features:** Recency, Frequency, Monetary")
+        st.write("**Preprocessing:** StandardScaler")
+
 else:
     st.header("Product Recommendation")
 
@@ -116,3 +123,8 @@ else:
 
             else:
                 st.error("Product not found. Please enter the exact product name.")
+
+    with st.expander(" Recommendation System Information"):
+        st.write("**Method:** Product similarity")
+        st.write("**Storage:** SQLite")
+        st.write("**Maximum recommendations:** 20")
