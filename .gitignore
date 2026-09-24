@@ -1,7 +1,9 @@
 venv/
 Lib/
+pyvenv.cfg
 Scripts/
 __pycache__/
 .idea/
+*.csv
 .ipynb_checkpoints/
 product_similarity.pkl
