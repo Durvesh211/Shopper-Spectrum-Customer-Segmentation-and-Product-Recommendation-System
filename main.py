@@ -13,10 +13,9 @@ st.markdown(
     **product recommendations** based on historical purchase patterns.
 
     Use the menu on the left to explore the two modules.
-    """
-)
-
+    """)
 st.divider()
+
 selection = st.sidebar.selectbox("Select Module",["Customer Segmentation","Product Recommendation"])
 
 scaler = joblib.load('scaler.pkl')
@@ -29,6 +28,7 @@ clusters= {
     3: 'Regular customer',
     4: 'VIP customer'
 }
+
 
 if selection == "Customer Segmentation":
     st.header("Customer Segmentation")
@@ -47,15 +47,47 @@ if selection == "Customer Segmentation":
         - **Monetary** → How much the customer spent
         """
     )
-    recency = st.number_input("Recency(days)", min_value =0)
-    frequency = st.number_input("Frequency",min_value = 0.0)
-    monetary = st.number_input("Monetary",min_value = 0)
-    if st.button("Predict Cluster"):
-        input_data = pd.DataFrame([[recency, frequency, monetary]],
-            columns=["Recency", "Frequency", "Monetary"])
-        scaled =scaler.transform(input_data)
-        cluster = kmeans.predict(scaled)[0]
-        st.success(f"Predicted Cluster: {clusters[cluster]}")
+    customer_rfm = pd.read_csv("customer_rfm.csv")
+
+    st.info("Enter a Customer ID to automatically retrieve their "
+            "Recency, Frequency, and Monetary values.")
+    st.markdown("For example: 17850")
+
+    customer_id = st.number_input(
+        "Enter Customer ID",
+        min_value=1,
+        step=1,
+        help="Enter the Customer ID from the transaction dataset."
+    )
+
+    if st.button("Find Customer"):
+        customer = customer_rfm[customer_rfm["CustomerID"] == customer_id]
+        if customer.empty:
+            st.error("Customer ID not found. Please check the ID and try again.")
+        else:
+            customer = customer.iloc[0]
+            recency = int(customer["Recency"])
+            frequency = int(customer["Frequency"])
+            monetary = float(customer["Monetary"])
+
+            st.success(f"Customer {int(customer_id)} found.")
+            st.subheader("Customer RFM Profile")
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                st.metric("Recency",f"{recency} days")
+            with col2:
+                st.metric("Frequency", frequency)
+
+            with col3:
+                st.metric("Monetary",f"{monetary:.2f}")
+
+            input_data = pd.DataFrame(
+                [[recency, frequency, monetary]],
+                columns=[ "Recency", "Frequency","Monetary"]
+            )
+            scaled =scaler.transform(input_data)
+            cluster = kmeans.predict(scaled)[0]
+            st.success(f"Predicted Cluster: {clusters[cluster]}")
 
     with st.expander("⚙️ Model Information"):
         st.write("**Algorithm:** K-Means Clustering")
